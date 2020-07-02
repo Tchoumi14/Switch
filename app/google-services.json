@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "599032251262",
+    "firebase_url": "https://switch-f3191.firebaseio.com",
+    "project_id": "switch-f3191",
+    "storage_bucket": "switch-f3191.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599032251262:android:9e6eb71ea563ed8145292f",
+        "android_client_info": {
+          "package_name": "e.brice.aswitch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599032251262-8968oldlh6dk17p3lvku20hdlbtnpcjt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXg8Cm2xPN5b6TO2g_VKRZiCj7BlwZg_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599032251262-8968oldlh6dk17p3lvku20hdlbtnpcjt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
