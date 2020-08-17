@@ -19,6 +19,7 @@ import com.squareup.picasso.Picasso
 import e.brice.aswitch.Fragments.ChatsFragment
 import e.brice.aswitch.Fragments.SearchFragment
 import e.brice.aswitch.Fragments.SettingsFragment
+import e.brice.aswitch.ModelClasses.Chat
 import e.brice.aswitch.ModelClasses.Users
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -42,14 +43,48 @@ class MainActivity : AppCompatActivity() {
 
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
-        val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+//        val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+//
+//        viewPagerAdapter.addFragment(ChatsFragment(), "Chats")
+//        viewPagerAdapter.addFragment(SearchFragment(), "Search")
+//        viewPagerAdapter.addFragment(SettingsFragment(), "Settings")
+//
+//        viewPager.adapter = viewPagerAdapter
+//        tabLayout.setupWithViewPager(viewPager)
+        val ref = FirebaseDatabase.getInstance().reference.child("Chats")
+        ref!!.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot)
+            {
+                val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
+                var countUnreadMessages = 0
+                for (dataSnapshot in p0.children)
+                {
+                    val chat = dataSnapshot.getValue(Chat::class.java)
+                    if (chat!!.getReceiver().equals(firebaseUser!!.uid) && !chat.isIsSeen())
+                    {
+                        countUnreadMessages += 1
+                    }
+                }
+                if (countUnreadMessages == 0 )
+                {
+                    viewPagerAdapter.addFragment(ChatsFragment(), "Chats")
+                }
+                else
+                {
+                    viewPagerAdapter.addFragment(ChatsFragment(), "($countUnreadMessages)Chats")
+                }
 
-        viewPagerAdapter.addFragment(ChatsFragment(), "Chats")
-        viewPagerAdapter.addFragment(SearchFragment(), "Search")
-        viewPagerAdapter.addFragment(SettingsFragment(), "Settings")
+                viewPagerAdapter.addFragment(SearchFragment(), "Search")
+                viewPagerAdapter.addFragment(SettingsFragment(), "Settings")
+                viewPager.adapter = viewPagerAdapter
+                tabLayout.setupWithViewPager(viewPager)
+            }
 
-        viewPager.adapter = viewPagerAdapter
-        tabLayout.setupWithViewPager(viewPager)
+            override fun onCancelled(p0: DatabaseError)
+            {
+
+            }
+        })
 
         //display username and profile picture
         refUsers!!.addValueEventListener(object : ValueEventListener{
@@ -59,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                     val user: Users? = p0.getValue(Users::class.java)
 
                     user_name.text = user!!.getUsername()
-                    Picasso.get().load(user.getProfile()).placeholder(R.drawable.profi).into(profile_image)
+                    Picasso.get().load(user.getProfile()).placeholder(R.drawable.profile).into(profile_image)
 
                 }
             }
@@ -128,5 +163,24 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    private fun updateSatuts(status: String)
+    {
+        val ref = FirebaseDatabase.getInstance().reference.child("Users").child(firebaseUser!!.uid)
+
+        val hashMap = HashMap<String, Any>()
+        hashMap["status"] = status
+        ref!!.updateChildren(hashMap)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateSatuts("online")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        updateSatuts("offline")
     }
 }
